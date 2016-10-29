@@ -1,0 +1,20 @@
+train_data_path deen/train/ csen/train/ fien/train/ ruen/train/
+dev_data_path deen/dev/ csen/dev/ fien/dev/ ruen/dev/
+
+max_epochs 1000000000000
+patience -1
+learning_rate 0.0001
+
+optimizer adam
+decay_c 0
+use_dropout 0
+clip_c 1
+
+source_word_level 1
+target_word_level 0
+
+source_dataset all_de-en.de.tok.shuf.iso9.bpe.50000 all_cs-en.cs.tok.iso9.bpe.50000 all_fi-en.fi.tok.shuf.iso9.bpe.50000 all_ru-en.ru.tok.iso9.bpe.50000
+target_dataset all_de-en.en.tok.shuf.iso9 all_cs-en.en.tok.iso9 all_fi-en.en.tok.shuf.iso9 all_ru-en.en.tok.iso9
+
+valid_source_dataset newstest2013.de.tok.iso9.bpe.50000 newstest2013-ref.cs.tok.iso9.bpe.50000 newsdev2015-enfi-ref.fi.tok.iso9.bpe.50000 newstest2013-ref.ru.tok.iso9.bpe.50000
+valid_target_dataset newstest2013.en.tok.iso9 newstest2013-src.en.tok.iso9 newsdev2015-enfi-src.en.tok.iso9 newstest2013-src.en.tok.iso9
