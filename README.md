@@ -68,7 +68,7 @@ $ python bpe2char/train_multi_bpe2char.py
 $ python char2char/train_multi_char2char.py 
 ```
 #### Checkpoint
-To resume training a model from a checkpoint, simply append `-re_load` and `-re_load_old_setting` above. Make sure the checkpoint resides in the correct directory (e.g. `.../dl4mt-c2c/models/bi-char2char`).
+To resume training a model from a checkpoint, simply append `-re_load` and `-re_load_old_setting` above. Make sure the checkpoint resides in the correct directory (`.../dl4mt-c2c/models`).
 
 Decoding
 ------------------
