@@ -55,10 +55,10 @@ def translate_model(jobqueue, resultqueue, model, options, k, normalize, build_s
 
 def main(model, dictionary, dictionary_target, source_file, saveto, k=6,
          normalize=False, encoder_chr_level=False,
-         decoder_chr_level=False, utf8=False, decoder_bpe_to_tok=False,
+         decoder_chr_level=False, utf8=False, 
         model_id=None, silent=False,):
 
-    sys.path.insert(0, home + "character_base/")
+    sys.path.insert(0, "/misc/kcgscratch1/ChoGroup/jasonlee/dl4mt-c2c/bpe2char")
     from char_base import (build_sampler, gen_sample, init_params)
 
     # load model model_options
@@ -144,28 +144,24 @@ def main(model, dictionary, dictionary_target, source_file, saveto, k=6,
     print "translations retrieved"
 
     with open(saveto, 'w') as f:
-        if decoder_bpe_to_tok:
-            print >>f, u'\n'.join(trans).encode('utf-8').replace('@@ ', '')
-        else:
-            print >>f, u'\n'.join(trans).encode('utf-8')
+        print >>f, u'\n'.join(trans).encode('utf-8')
 
     print "Done", saveto
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-k', type=int, default=20)
-    parser.add_argument('-n', action="store_true", default=True)
-    parser.add_argument('-bpe', action="store_true", default=True)
-    parser.add_argument('-enc_c', action="store_true", default=False)
-    parser.add_argument('-dec_c', action="store_true", default=True)
+    parser.add_argument('-k', type=int, default=20) # beam width
+    parser.add_argument('-n', action="store_true", default=True) # normalize scores for different hypothesis based on their length (to penalize shorter hypotheses, longer hypotheses are already penalized by the BLEU measure, which is precision of sorts).
+    parser.add_argument('-enc_c', action="store_true", default=False) # is encoder character-level?
+    parser.add_argument('-dec_c', action="store_true", default=True) # is decoder character-level?
     parser.add_argument('-utf8', action="store_true", default=True)
-    parser.add_argument('-many', action="store_true", default=False)
-    parser.add_argument('-iso9', action="store_true", default=False)
-    parser.add_argument('-model', type=str)
-    parser.add_argument('-translate', type=str)
-    parser.add_argument('-saveto', type=str)
-    parser.add_argument('-silent', action="store_true", default=False)
-    parser.add_argument('-which', type=str, help="dev / test1 / test2")
+    parser.add_argument('-many', action="store_true", default=False) # multilingual model?
+    parser.add_argument('-model', type=str) # absolute path to a model (.npz file)
+    parser.add_argument('-translate', type=str, help="de_en / cs_en / fi_en / ru_en") # which language? 
+    parser.add_argument('-saveto', type=str) # absolute path where the translation should be saved
+    parser.add_argument('-which', type=str, help="dev / test1 / test2", default="dev") # if you wish to translate any of development / test1 / test2 file from WMT15, simply specify which one here
+    parser.add_argument('-source', type=str, default="") # if you wish to provide your own file to be translated, provide an absolute path to the file to be translated
+    parser.add_argument('-silent', action="store_true", default=False) # suppress progress messages
 
     args = parser.parse_args()
 
@@ -174,7 +170,7 @@ if __name__ == "__main__":
         which_wmt = "multi-wmt15"
     else:
         which_wmt = "wmt15"
-    data_path = "/local/home/leeyu/dataset/%s/" % which_wmt # change accordingly
+    data_path = "/misc/kcgscratch1/ChoGroup/jasonlee/temp_data/%s/" % which_wmt # change appropriately
 
     if args.which not in "dev test1 test2".split():
         raise Exception('1')
@@ -209,6 +205,10 @@ if __name__ == "__main__":
     dictionary = data_path + dictionary
     dictionary_target = data_path + dictionary_target
     source = data_path + source
+
+    if args.source != "":
+        source = args.source
+
     print "src dict:", dictionary
     print "trg dict:", dictionary_target
     print "source:", source
@@ -221,7 +221,7 @@ if __name__ == "__main__":
     main(args.model, dictionary, dictionary_target, source,
          args.saveto, k=args.k, normalize=args.n, encoder_chr_level=args.enc_c,
          decoder_chr_level=args.dec_c,
-         utf8=args.utf8, decoder_bpe_to_tok=args.bpe,
+         utf8=args.utf8, 
         model_id = model_id,
          silent=args.silent,
          )
