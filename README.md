@@ -57,7 +57,7 @@ $ python bpe2char/train_bi_bpe2char.py -translate <LANGUAGE_PAIR>
 ```
 #### Bilingual char2char
 ```bash
-$ python train_bi_char2char.py -translate <LANGUAGE_PAIR>
+$ python char2char/train_bi_char2char.py -translate <LANGUAGE_PAIR>
 ```
 #### Multilingual bpe2char
 ```bash
@@ -65,7 +65,7 @@ $ python bpe2char/train_multi_bpe2char.py
 ```
 #### Multilingual char2char
 ```bash
-$ python train_multi_char2char.py 
+$ python char2char/train_multi_char2char.py 
 ```
 #### Checkpoint
 To resume training a model from a checkpoint, simply append `-re_load` and `-re_load_old_setting` above. Make sure the checkpoint resides in the correct directory (`.../dl4mt-c2c/models`).
@@ -78,8 +78,8 @@ Before executing the following, modify `translate*.py` such that the correct dir
 
 ```bash
 $ export THEANO_FLAGS=device=gpu,floatX=float32,lib.cnmem=0.95,allow_gc=False
-$ python translate_bpe2char.py -model <PATH_TO_MODEL.npz> -translate <LANGUAGE_PAIR> -saveto <DESTINATION> -which <VALID/TEST_SET> # for bpe2char models
-$ python translate_char2char.py -model <PATH_TO_MODEL.npz> -translate <LANGUAGE_PAIR> -saveto <DESTINATION> -which <VALID/TEST_SET> # for char2char models
+$ python translate/translate_bpe2char.py -model <PATH_TO_MODEL.npz> -translate <LANGUAGE_PAIR> -saveto <DESTINATION> -which <VALID/TEST_SET> # for bpe2char models
+$ python translate/translate_char2char.py -model <PATH_TO_MODEL.npz> -translate <LANGUAGE_PAIR> -saveto <DESTINATION> -which <VALID/TEST_SET> # for char2char models
 ```
 
 ### Decoding an arbitrary file
@@ -91,7 +91,7 @@ If you choose to decode your own source file, make sure it is:
 2. bpe-tokenized for bpe2char models.
 3. Cyrillic characters should be converted to Latin for multilingual models.
 
-### Multilingual
+### Decoding multilingual models
 Append `-many` (of course, provide a path to a multilingual model for `-model`).
 
 Evaluation
@@ -101,9 +101,9 @@ We use the script from MOSES to compute the bleu score. The reference translatio
 perl preprocess/multi-bleu.perl reference.txt < model_output.txt
 ```
 
-Miscellaneous
+Extra
 -----------------
-### Learning & Applying BPE Rules
+### Extracting & Applying BPE Rules
 
 Clone the Subword-NMT repository.
 ```bash

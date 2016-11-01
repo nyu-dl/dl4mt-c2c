@@ -61,7 +61,7 @@ def train(
       enc_dim=1000,
       dec_dim=1000,  # the number of LSTM units
       model_name="model_name",
-      conv_widths=4,
+      conv_width=4,
       conv_nkernels=256,
       pool_window=-1,
       pool_stride=-1,
