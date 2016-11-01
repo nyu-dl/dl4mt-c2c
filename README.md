@@ -103,7 +103,7 @@ perl preprocess/multi-bleu.perl reference.txt < model_output.txt
 
 Extra
 -----------------
-### Extracting & Applying BPE Rules
+### Extracting & applying BPE rules
 
 Clone the Subword-NMT repository.
 ```bash
@@ -116,7 +116,7 @@ Use following commands (find more information in [Subword-NMT](https://github.co
 ./apply_bpe.py -c {codes_file} < {test_file}
 ```
 
-### Converting Cyrillic Characters
+### Converting Cyrillic to Latin
 
 ```bash
 $ python preprocess/iso.py russian_source.txt
