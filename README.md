@@ -5,108 +5,132 @@ Theano implementation of the models described in the paper [Fully Character-Leve
 
 We present code for training and decoding four different models:
 
-1. bi-bpe2char (from [Chung et al., 2016](https://arxiv.org/abs/1603.06147 "Chung et al., 2016"), code slightly modified.)
+1. bilingual bpe2char (from [Chung et al., 2016](https://arxiv.org/abs/1603.06147)).
+2. bilingual char2char
+3. multilingual bpe2char
+4. multilingual char2char
 
-2. bi-char2char
-
-3. multi-bpe2char
-
-4. multi-char2char
-
-DEPENDENCIES
+Dependencies
 ------------------
 ### Python
 * Theano
 * Numpy
 * NLTK
 
-For preprocessing and evaluation, we used some scripts from [MOSES](https://github.com/moses-smt/mosesdecoder "MOSES").
+### GPU
+* CUDA (we recommend using the latest version. The version 8.0 was used in all our experiments.)
 
-This code is based on [Subword-NMT](http://arxiv.org/abs/1508.07909 "Subword-NMT") and [dl4mt-cdec](https://github.com/nyu-dl/dl4mt-cdec "dl4mt-cdec").
+### Related code
+* For preprocessing and evaluation, we used scripts from [MOSES](https://github.com/moses-smt/mosesdecoder "MOSES").
+* This code is based on [Subword-NMT](http://arxiv.org/abs/1508.07909 "Subword-NMT") and [dl4mt-cdec](https://github.com/nyu-dl/dl4mt-cdec "dl4mt-cdec").
 
-DOWNLOADING DATASETS
+Downloading Datasets & Pre-trained Models
 ------------------
+The original WMT'15 corpora can be downloaded from [here](http://www.statmt.org/wmt15/translation-task.html). For the preprocessed corpora used in our experiments, see below.
+* WMT'15 preprocessed corpora
+  * [Standard version (for bilingual models, 3.5GB)](https://drive.google.com/open?id=0BxmEQ91VZAPQam5pc2ltQ1BBTTQ)
+  * [Cyrillic converted to Latin (for multilingual models, 2.6GB)](https://drive.google.com/open?id=0BxmEQ91VZAPQS0oxTDJINng5b1k)
 
+To obtain the pre-trained top-performing models, see below.
+* [Pre-trained models (6.0GB)](https://drive.google.com/open?id=0BxmEQ91VZAPQelA5d21aVTJ2OUE)
 
-TRAINING A MODEL
+Training Details
 ------------------
-
-Code for training bpe2char models resides in `dl4mt-c2c/bpe2char`. 
-
-To use GPUs, do
-
+### Using GPUs
+Do the following before executing `train*.py`.
 ```bash
 $ export THEANO_FLAGS=device=gpu,floatX=float32
 ```
+With space permitting on your GPU, it may speed up training to use `cnmem`:
+```bash
+$ export THEANO_FLAGS=device=gpu,floatX=float32,lib.cnmem=0.95,allow_gc=False
+```
 
-before starting training.
+On a pre-2016 Titan X GPU with 12GB RAM, our bpe2char models were trained with `cnmem`. Our char2char models (both bilingual and multilingual) were trained without `cnmem` (due to lack of RAM).
 
-1. bi-bpe2char
+### Training models
+Before executing the following, modify `train*.py` such that the correct directory containing WMT15 corpora is referenced.
+
+#### Bilingual bpe2char
 ```bash
 $ python bpe2char/train_bi_bpe2char.py -translate <LANGUAGE_PAIR>
 ```
-
-2. bi-char2char
+#### Bilingual char2char
 ```bash
 $ python train_bi_char2char.py -translate <LANGUAGE_PAIR>
 ```
-
-3. multi-bpe2char
+#### Multilingual bpe2char
 ```bash
 $ python bpe2char/train_multi_bpe2char.py 
 ```
-
-4. multi-char2char
+#### Multilingual char2char
 ```bash
 $ python train_multi_char2char.py 
 ```
+#### Checkpoint
+To resume training a model from a checkpoint, simply append `-re_load` and `-re_load_old_setting` above. Make sure the checkpoint resides in the correct directory (`.../dl4mt-c2c/models`).
 
-To resume training a model from a checkpoint, simply append `-re_load` and `-re_load_old_setting` above. Make sure the checkpoint resides in the correct directory.
-
-DECODING
+Decoding
 ------------------
 
-1. bpe2char models
+### Decoding WMT'15 validation / test files
+Before executing the following, modify `translate*.py` such that the correct directory containing WMT15 corpora is referenced.
+
 ```bash
-$ cd dl4mt-c2c
-$ python translate_char2char.py -translate <LANGUAGE_PAIR> -saveto <DESTINATION> -which <VALID/TEST_SET>
+$ export THEANO_FLAGS=device=gpu,floatX=float32,lib.cnmem=0.95,allow_gc=False
+$ python translate_bpe2char.py -model <PATH_TO_MODEL.npz> -translate <LANGUAGE_PAIR> -saveto <DESTINATION> -which <VALID/TEST_SET> # for bpe2char models
+$ python translate_char2char.py -model <PATH_TO_MODEL.npz> -translate <LANGUAGE_PAIR> -saveto <DESTINATION> -which <VALID/TEST_SET> # for char2char models
 ```
 
-2. char2char models
-```bash
-$ cd dl4mt-c2c
-$ python translate_bpe2char.py -translate <LANGUAGE_PAIR> -saveto <DESTINATION> -which <VALID/TEST_SET>
-```
+### Decoding an arbitrary file
+Remove `-which <VALID/TEST_SET>` and append `-source <PATH_TO_SOURCE>`.
 
-To decode multilingual models, append `-many`.
+If you choose to decode your own source file, make sure it is:
 
-EVALUATION
+1. properly tokenized (using `preprocess/preprocess.sh`).
+2. bpe-tokenized for bpe2char models.
+3. Cyrillic characters should be converted to Latin for multilingual models.
+
+### Multilingual
+Append `-many` (of course, provide a path to a multilingual model for `-model`).
+
+Evaluation
 ------------------
-
+We use the script from MOSES to compute the bleu score. The reference translations can be found in `.../wmt15`.
 ```
 perl preprocess/multi-bleu.perl reference.txt < model_output.txt
 ```
 
-TREATMENT OF CYRILLIC
-------------------
+Miscellaneous
+-----------------
+### Learning & Applying BPE Rules
+
+Clone the Subword-NMT repository.
+```bash
+git clone https://github.com/rsennrich/subword-nmt
+```
+
+Use following commands (find more information in [Subword-NMT](https://github.com/rsennrich/subword-nmt))
+```bash
+./learn_bpe.py -s {num_operations} < {train_file} > {codes_file}
+./apply_bpe.py -c {codes_file} < {test_file}
+```
+
+### Converting Cyrillic Characters
 
 ```bash
-$ python iso.py <FILE_TO_BE_CONVERTED>
+$ python preprocess/iso.py russian_source.txt
 ```
+will produce an output at `russian_source.txt.iso9`.
 
-PRE-TRAINED MODELS
-------------------
-
-CITATION
+Citation
 ------------------
 
 ```
-@article{Lee16,
+@article{Lee:16,
   author    = {Jason Lee and Kyunghyun Cho and Thomas Hofmann},
   title     = {Fully Character-Level Neural Machine Translation without Explicit Segmentation},
-  journal   = {CoRR},
-  volume    = {abs/1610.03017},
   year      = {2016},
-  url       = {http://arxiv.org/abs/1610.03017},
+  journal   = {arXiv preprint arXiv:1610.03017},
 }
 ```

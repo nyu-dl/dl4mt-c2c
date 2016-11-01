@@ -6,7 +6,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-f = open("iso9", 'rb')
+f = open("preprocess/iso9", 'rb')
 lines = [line for line in f]
 bigru = lines[::4]
 smallru = lines[1::4]

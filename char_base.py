@@ -23,7 +23,7 @@ def init_params(options):
     params['Wemb'] = norm_weight(options['n_words_src'], options['dim_word_src'])
     params['Wemb_dec'] = norm_weight(options['n_words'], options['dim_word'])
 
-    params = get_layer('multi_scale_conv_encoder')[0](options, params, prefix='multi_scale_conv_enc1', dim=options['dim_word_src'], width=options['conv_width'], nkernels=options['conv_nkernels'])
+    params = get_layer('multi_scale_conv_encoder')[0](options, params, prefix='multi_scale_conv_enc1', dim=options['dim_word_src'], width=options['conv_widths'], nkernels=options['conv_nkernels'])
 
     for ii in xrange(options['highway']):
         params = get_layer('hw')[0](options, params, prefix="hw_network{}".format(ii+1), dim=numpy.sum(options['conv_nkernels']))
@@ -99,7 +99,7 @@ def build_model(tparams, options):
     emb = emb.reshape([n_timesteps, n_samples, options['dim_word_src']])
     # emb.shape = (maxlen_x_pad + 2*pool_stride, n_samples, dim_word_src)
 
-    conv_out = get_layer('multi_scale_conv_encoder')[1](tparams, emb, options, prefix='multi_scale_conv_enc1', width=options['conv_width'], nkernels=options['conv_nkernels'], pool_window=options['pool_window'], pool_stride=options['pool_stride'])
+    conv_out = get_layer('multi_scale_conv_encoder')[1](tparams, emb, options, prefix='multi_scale_conv_enc1', width=options['conv_widths'], nkernels=options['conv_nkernels'], pool_window=options['pool_window'], pool_stride=options['pool_stride'])
     # conv_out.shape = (maxlen_x_pad/pool_stride, n_samples, sum(nkernels))
 
     hw_in = conv_out.reshape([conv_out.shape[0] * conv_out.shape[1], conv_out.shape[2]])
@@ -184,7 +184,7 @@ def build_sampler(tparams, options, trng, use_noise):
     emb = tparams['Wemb'][x.flatten()]
     emb = emb.reshape([n_timesteps, n_samples, options['dim_word_src']])
 
-    conv_out = get_layer('multi_scale_conv_encoder')[1](tparams, emb, options, prefix='multi_scale_conv_enc1', width=options['conv_width'], nkernels=options['conv_nkernels'], pool_window=options['pool_window'], pool_stride=options['pool_stride'])
+    conv_out = get_layer('multi_scale_conv_encoder')[1](tparams, emb, options, prefix='multi_scale_conv_enc1', width=options['conv_widths'], nkernels=options['conv_nkernels'], pool_window=options['pool_window'], pool_stride=options['pool_stride'])
 
     hw_in = conv_out.reshape([conv_out.shape[0] * conv_out.shape[1], conv_out.shape[2]])
     for ii in xrange(options['highway']):

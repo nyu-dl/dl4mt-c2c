@@ -34,7 +34,7 @@ def main(job_id, args):
         dim_word_src=args.dim_word_src,
         dim_word=args.dim_word,
 
-        conv_width=args.conv_width,
+        conv_widths=args.conv_widths,
         conv_nkernels=args.conv_nkernels,
 
         pool_window=args.pool_window,
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     parser.add_argument('-translate', type=str, default="de_en", help="de_en / cs_en / fi_en / ru_en")
     parser.add_argument('-highway', type=int, default=4)
 
-    parser.add_argument('-conv_width', type=str, default="1-2-3-4-5-6-7-8")
+    parser.add_argument('-conv_widths', type=str, default="1-2-3-4-5-6-7-8")
     parser.add_argument('-conv_nkernels', type=str, default="200-200-250-250-300-300-300-300")
 
     parser.add_argument('-pool_window', type=int, default=5)
@@ -149,13 +149,13 @@ if __name__ == '__main__':
     if args.translate not in "de_en cs_en fi_en ru_en".split():
         raise Exception('1')
 
-    args.model_name = "hw{}-{}-{}-{}{}-{}-{}-{}-{}".format(args.highway, string.replace(args.conv_width, "-", ""), args.conv_nkernels, args.pool_window, args.pool_stride, args.enc_dim, args.dim_word_src, args.maxlen, args.maxlen_trg)
+    args.model_name = "hw{}-{}-{}-{}{}-{}-{}-{}-{}".format(args.highway, string.replace(args.conv_widths, "-", ""), args.conv_nkernels, args.pool_window, args.pool_stride, args.enc_dim, args.dim_word_src, args.maxlen, args.maxlen_trg)
 
-    args.conv_width = [ int(x) for x in args.conv_width.split("-") ]
+    args.conv_widths = [ int(x) for x in args.conv_widths.split("-") ]
     args.conv_nkernels = [ int(x) for x in args.conv_nkernels.split("-") ]
 
-    args.model_path = "/misc/kcgscratch1/ChoGroup/jasonlee/dl4mt-c2c/models/" # change accordingly
-    args.data_path = "/misc/kcgscratch1/ChoGroup/jasonlee/temp_data/wmt15/" # change accordingly
+    args.model_path = "/local/home/leeyu/scratch/dl4mt-c2c/models/" # change to /...your_directory.../dl4mt-c2c/models/
+    args.data_path = "/local/home/leeyu/dataset/wmt15/" # change to /...your_directory.../wmt15/
     args.model_path = args.model_path + args.translate + "/"
 
     print "Model path:", args.model_path

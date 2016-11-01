@@ -86,7 +86,6 @@ def main(job_id, params):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-model_name', type=str, help="", default="bi-bpe2char")
     parser.add_argument('-translate', type=str, default="de_en", help="de_en / cs_en / fi_en / ru_en")
 
     parser.add_argument('-enc_dim', type=int, default=512, help="")
@@ -138,8 +137,10 @@ if __name__ == '__main__':
     args.n_words_src = n_words_dic[args.translate][0]
     args.n_words= n_words_dic[args.translate][1]
 
-    args.save_path = "/misc/kcgscratch1/ChoGroup/jasonlee/dl4mt-c2c/models/" # change accordingly
-    args.data_path = "/misc/kcgscratch1/ChoGroup/jasonlee/temp_data/wmt15/" # change accordingly
+    args.model_name = "bi-bpe2char"
+
+    args.save_path = "/local/home/leeyu/scratch/dl4mt-c2c/models/"
+    args.data_path = "/local/home/leeyu/dataset/wmt15/"
     args.save_path = args.save_path + args.translate + "/"
 
     main(0, args)

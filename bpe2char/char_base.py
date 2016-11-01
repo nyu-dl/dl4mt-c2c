@@ -27,11 +27,11 @@ def init_params(options):
     params['Wemb_dec'] = norm_weight(options['n_words'], options['dim_word'])
 
     # encoder
-    params = get_layer('gru')[0](options, params,
+    params = get_layer(options['gru'])[0](options, params,
                                  prefix='encoder',
                                  nin=options['dim_word_src'],
                                  dim=options['enc_dim'])
-    params = get_layer('gru')[0](options, params,
+    params = get_layer(options['gru'])[0](options, params,
                                  prefix='encoderr',
                                  nin=options['dim_word_src'],
                                  dim=options['enc_dim'])
@@ -107,9 +107,9 @@ def build_model(tparams, options):
     embr = embr.reshape([n_timesteps, n_samples, options['dim_word_src']])
 
     # pass through gru layer, recurrence here
-    proj = get_layer('gru')[1](tparams, emb, options,
+    proj = get_layer(options['gru'])[1](tparams, emb, options,
                                prefix='encoder', mask=x_mask)
-    projr = get_layer('gru')[1](tparams, embr, options,
+    projr = get_layer(options['gru'])[1](tparams, embr, options,
                                 prefix='encoderr', mask=xr_mask)
 
     # context
@@ -183,8 +183,8 @@ def build_sampler(tparams, options, trng, use_noise):
     embr = tparams['Wemb'][xr.flatten()]
     embr = embr.reshape([n_timesteps, n_samples, options['dim_word_src']])
 
-    proj = get_layer('gru')[1](tparams, emb, options, prefix='encoder')
-    projr = get_layer('gru')[1](tparams, embr, options, prefix='encoderr')
+    proj = get_layer(options['gru'])[1](tparams, emb, options, prefix='encoder')
+    projr = get_layer(options['gru'])[1](tparams, embr, options, prefix='encoderr')
 
     ctx = concatenate([proj, projr[::-1]], axis=proj.ndim-1)
     ctx_mean = ctx.mean(0)

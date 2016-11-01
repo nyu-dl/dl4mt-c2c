@@ -7,23 +7,28 @@ import numpy
 from char_base_multi_b2c import *
 from nmt_many import train
 
+save_path = "/local/home/leeyu/scratch/dl4mt-c2c/models/"
+data_path = "/local/home/leeyu/dataset/multi-wmt15/"
+dic_path = "/local/home/leeyu/dataset/multi-wmt15/dic/"
+
 from collections import OrderedDict
 
 def main(job_id, params, args):
     print args
     save_file_name = args.model_name
-    source_dataset = [args.data_path + path + tr for path, tr in zip(params['train_data_path'], params['source_dataset'])]
-    target_dataset = [args.data_path + path + tr for path, tr in zip(params['train_data_path'], params['target_dataset'])]
+    source_dataset = [data_path + path + tr for path, tr in zip(params['train_data_path'], params['source_dataset'])]
+    target_dataset = [data_path + path + tr for path, tr in zip(params['train_data_path'], params['target_dataset'])]
 
-    valid_source_dataset = [args.data_path + path + tr for path, tr in zip(params['dev_data_path'], params['valid_source_dataset'])]
-    valid_target_dataset = [args.data_path + path + tr for path, tr in zip(params['dev_data_path'], params['valid_target_dataset'])]
+    valid_source_dataset = [data_path + path + tr for path, tr in zip(params['dev_data_path'], params['valid_source_dataset'])]
+    valid_target_dataset = [data_path + path + tr for path, tr in zip(params['dev_data_path'], params['valid_target_dataset'])]
 
-    source_dictionary = args.dic_path + args.source_dictionary
-    target_dictionary = args.dic_path + args.target_dictionary
+    source_dictionary = dic_path + args.source_dictionary
+    target_dictionary = dic_path + args.target_dictionary
 
-    args.save_path = args.save_path + args.translate + "/"
+    global save_path
+    save_path = save_path + "many_en" + "/"
 
-    print params, args.save_path, save_file_name
+    print params, save_path, save_file_name
     validerr = train(
         max_epochs=int(params['max_epochs']),
         patience=int(params['patience']),
@@ -31,7 +36,7 @@ def main(job_id, params, args):
         dim_word=args.dim_word,
         dim_word_src=args.dim_word_src,
 
-        save_path=args.save_path,
+        save_path=save_path,
         save_file_name=save_file_name,
         re_load=args.re_load,
         re_load_old_setting=args.re_load_old_setting,
@@ -79,7 +84,6 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-model_name', type=str, help="", default="multi-bpe2char")
-    parser.add_argument('-translate', type=str, default="many_en")
 
     parser.add_argument('-enc_dim', type=int, default=512, help="")
     parser.add_argument('-dec_dim', type=int, default=1024, help="")
@@ -113,6 +117,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    args.model_name = args.model_name + "-" + str(args.enc_dim)
+
     args.train_batch_size = [ int(x) for x in args.train_batch_size.split("/") ]
 
     train_batch_sum = numpy.sum(args.train_batch_size)
@@ -120,11 +126,7 @@ if __name__ == '__main__':
     args.train_batch_size = [ int(numpy.ceil(args.batch_size * x / float(train_batch_sum))) for x in args.train_batch_size ]
     args.train_batch_size = [ 14, 37, 6, 7 ]
 
-    args.save_path = "/misc/kcgscratch1/ChoGroup/jasonlee/dl4mt-c2c/models/" # change accordingly
-    args.data_path = "/misc/kcgscratch1/ChoGroup/jasonlee/temp_data/multi-wmt15/" # change accordingly
-    args.dic_path = "/misc/kcgscratch1/ChoGroup/jasonlee/temp_data/multi-wmt15/dic/" # change accordingly
-
-    config_file_name = '/misc/kcgscratch1/ChoGroup/jasonlee/dl4mt-c2c/bpe2char/wmt15_manyen_bpe2char_adam.txt' # change accordingly
+    config_file_name = '/local/home/leeyu/scratch/dl4mt-c2c/multi-bpe2char-code/wmt15_manyen_bpe2char_adam.txt'
 
     f = open(config_file_name, 'r')
     lines = f.readlines()
