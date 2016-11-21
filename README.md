@@ -32,7 +32,7 @@ The original WMT'15 corpora can be downloaded from [here](http://www.statmt.org/
   * [Cyrillic converted to Latin (for multilingual models, 2.6GB)](https://drive.google.com/open?id=0BxmEQ91VZAPQS0oxTDJINng5b1k)
 
 To obtain the pre-trained top-performing models, see below.
-* [Pre-trained models (6.0GB)](https://drive.google.com/open?id=0BxmEQ91VZAPQelA5d21aVTJ2OUE)
+* [Pre-trained models (6.0GB)](https://drive.google.com/open?id=0BxmEQ91VZAPQcGx4VGI2N3dMNEE): **Tarball updated** on Nov 21st 2016. The CS-EN bi-char2char model in the previous tarball was not the best-performing model. 
 
 Training Details
 ------------------
@@ -81,6 +81,8 @@ $ export THEANO_FLAGS=device=gpu,floatX=float32,lib.cnmem=0.95,allow_gc=False
 $ python translate/translate_bpe2char.py -model <PATH_TO_MODEL.npz> -translate <LANGUAGE_PAIR> -saveto <DESTINATION> -which <VALID/TEST_SET> # for bpe2char models
 $ python translate/translate_char2char.py -model <PATH_TO_MODEL.npz> -translate <LANGUAGE_PAIR> -saveto <DESTINATION> -which <VALID/TEST_SET> # for char2char models
 ```
+
+When choosing which pre-trained model to give to `-model`, make sure to choose e.g. `.grads.123000.npz`. The models with `.grads` in their names are the optimal models and you should be decoding from those.
 
 ### Decoding an arbitrary file
 Remove `-which <VALID/TEST_SET>` and append `-source <PATH_TO_SOURCE>`.
