@@ -70,6 +70,9 @@ $ python char2char/train_multi_char2char.py
 #### Checkpoint
 To resume training a model from a checkpoint, simply append `-re_load` and `-re_load_old_setting` above. Make sure the checkpoint resides in the correct directory (`.../dl4mt-c2c/models`).
 
+### Using Custom Datasets
+To train your models using your own dataset (and not the WMT'15 corpus), you first need to learn your vocabulary using `build_dictionary_char.py` or `build_dictionary_word.py` for char2char or bpe2char model, respectively. For the bpe2char model, you additionally need to learn your BPE segmentation rules on the source corpus using the Subword-NMT repository (see below).
+
 Decoding
 ------------------
 
