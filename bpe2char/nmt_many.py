@@ -194,7 +194,7 @@ def train(
         print 'You are reloading your experiment.. do not panic dude..'
         if re_load_old_setting:
             with open(model_name, 'rb') as f:
-                models_options = cPickle.load(f)
+                model_options = cPickle.load(f)
         params = load_params(file_name, params)
         # reload history
         model = numpy.load(file_name)
